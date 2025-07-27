@@ -7,10 +7,11 @@ import (
 )
 
 func main() {
-	n := 10
+	n := 10 // Количество генерируемых псевдослучайных чисел
 	randomNumbersCh := make(chan int, n)
 	squaredNumbers := make(chan int, n)
 
+	// Генератор псведвослучайных чисел
 	go func() {
 		defer close(randomNumbersCh)
 		for range n {
@@ -18,6 +19,7 @@ func main() {
 		}
 	}()
 
+	// Обработчик возведения в квадрат
 	go func() {
 		defer close(squaredNumbers)
 		for num := range randomNumbersCh {
@@ -26,7 +28,8 @@ func main() {
 		}
 	}()
 
+	// Вывод в строку
 	for value := range squaredNumbers {
-		fmt.Println(value)
+		fmt.Printf("%d ", value)
 	}
 }
