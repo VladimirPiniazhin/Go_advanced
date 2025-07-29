@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"go/http_serv/configs"
+	"go/http_serv/pkg/req"
 	res "go/http_serv/pkg/res"
 	"net/http"
 )
@@ -24,18 +25,27 @@ func NewAuthHandler(router *http.ServeMux, deps *AuthHandlerDeps) {
 }
 
 func (handler *AuthHandler) Register() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		result := "Registration is successful"
-		fmt.Fprintf(w, "%v", result)
+	return func(w http.ResponseWriter, request *http.Request) {
+		body, err := req.HandleBody[RegisterRequest](&w, request)
+		if err != nil {
+			return
+		}
+		result := fmt.Sprintf("Registration user %s is successful", body.Name)
+
+		res.JsonResponse(w, 201, result)
 
 	}
 }
+
 func (handler *AuthHandler) Login() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		data := LoginResponse{
-			Token: "123",
+	return func(w http.ResponseWriter, request *http.Request) {
+
+		_, err := req.HandleBody[LoginRequest](&w, request)
+		if err != nil {
+			return
 		}
-		res.Response(w, 201, data)
+		result := "Login is successful"
+		res.JsonResponse(w, 200, result)
 
 	}
 }
