@@ -1,4 +1,4 @@
-package pkg
+package res
 
 import (
 	"encoding/json"
