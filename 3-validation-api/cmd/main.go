@@ -5,11 +5,13 @@ import (
 	"go/http_serv/configs"
 	"go/http_serv/internals/auth"
 	"go/http_serv/internals/verify"
+	"go/http_serv/pkg/db"
 	"net/http"
 )
 
 func main() {
 	config := configs.LoadConfig()
+	_ = db.NewDb(config)
 	router := http.NewServeMux()
 	auth.NewAuthHandler(router)
 	verify.NewVerifyHandler(router, &verify.VerifyHandlerDeps{

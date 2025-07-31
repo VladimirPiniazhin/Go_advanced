@@ -4,7 +4,7 @@ services:
     image: postgres:16.4
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pass
+      POSTGRES_PASSWORD: ${PG_PASS}
       PGDATA: /data/postgres
     volumes:
       - ./postgres-data/:/data/postgres
