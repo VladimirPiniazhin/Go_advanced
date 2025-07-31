@@ -9,6 +9,11 @@ import (
 
 type Config struct {
 	MailConf EmailConfig
+	Db       DbConfig
+}
+
+type DbConfig struct {
+	Dsn string
 }
 
 type EmailConfig struct {
@@ -27,6 +32,9 @@ func LoadConfig() *Config {
 			Email:    os.Getenv("EMAIL"),
 			Password: os.Getenv("PASSWORD"),
 			Address:  os.Getenv("ADDRESS"),
+		},
+		Db: DbConfig{
+			Dsn: os.Getenv("DB_DSN"),
 		},
 	}
 }
