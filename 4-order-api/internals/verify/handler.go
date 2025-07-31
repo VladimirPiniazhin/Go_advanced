@@ -2,12 +2,12 @@ package verify
 
 import (
 	"fmt"
-	"go/http_serv/configs"
-	"go/http_serv/internals/user"
-	email "go/http_serv/pkg/email"
-	"go/http_serv/pkg/hash"
-	"go/http_serv/pkg/req"
-	res "go/http_serv/pkg/res"
+	"go/order-api/configs"
+	"go/order-api/internals/user"
+	email "go/order-api/pkg/email"
+	"go/order-api/pkg/hash"
+	"go/order-api/pkg/req"
+	res "go/order-api/pkg/res"
 	"net/http"
 )
 

@@ -1,7 +1,7 @@
 package req
 
 import (
-	res "go/http_serv/pkg/res"
+	res "go/order-api/pkg/res"
 	"net/http"
 )
 

@@ -2,9 +2,9 @@ package auth
 
 import (
 	"fmt"
-	"go/http_serv/internals/user"
-	"go/http_serv/pkg/req"
-	res "go/http_serv/pkg/res"
+	"go/order-api/internals/user"
+	"go/order-api/pkg/req"
+	res "go/order-api/pkg/res"
 	"net/http"
 )
 

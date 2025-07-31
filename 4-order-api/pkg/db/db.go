@@ -1,7 +1,7 @@
 package db
 
 import (
-	"go/http_serv/configs"
+	"go/order-api/configs"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
