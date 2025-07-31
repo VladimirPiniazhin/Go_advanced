@@ -2,17 +2,19 @@ package main
 
 import (
 	"fmt"
-	"go/http_serv/configs"
-	"go/http_serv/internals/auth"
-	"go/http_serv/internals/randomnums"
+	"go/order-api/configs"
+	"go/order-api/internals/auth"
+	"go/order-api/internals/verify"
+	"go/order-api/pkg/db"
 	"net/http"
 )
 
 func main() {
 	config := configs.LoadConfig()
+	_ = db.NewDb(config)
 	router := http.NewServeMux()
-	randomnums.NewRandomNumbersHandler(router)
-	auth.NewAuthHandler(router, &auth.AuthHandlerDeps{
+	auth.NewAuthHandler(router)
+	verify.NewVerifyHandler(router, &verify.VerifyHandlerDeps{
 		Config: config,
 	})
 

@@ -1,4 +1,4 @@
-module go/http_serv
+module go/order-api
 
 go 1.24.3
 
@@ -6,6 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/joho/godotenv v1.5.1
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
+	github.com/lib/pq v1.10.9
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.30.1
 )
