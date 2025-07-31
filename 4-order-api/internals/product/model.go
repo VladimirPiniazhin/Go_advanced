@@ -9,7 +9,7 @@ type Product struct {
 	gorm.Model
 	Description string         `json:"description"`
 	Name        string         `json:"name"`
-	Image       pq.StringArray `json:"img" gorm:"type:text[]"`
+	Images      pq.StringArray `json:"img" gorm:"type:text[]"`
 }
 
 type Cart struct {
