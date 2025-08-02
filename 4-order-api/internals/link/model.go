@@ -12,10 +12,18 @@ type Link struct {
 	Hash string `json:"hash" gorm:"uniqueIndex"`
 }
 
-func NewLink(url string) *Link {
+func NewLink(url string, linkRepo *LinkRepository) *Link {
+	hash := ""
+	for {
+		hash = RandsStringRunes(6)
+		_, err := linkRepo.GetByHash(hash)
+		if err != nil {
+			break
+		}
+	}
 	return &Link{
 		Url:  url,
-		Hash: "",
+		Hash: hash,
 	}
 }
 

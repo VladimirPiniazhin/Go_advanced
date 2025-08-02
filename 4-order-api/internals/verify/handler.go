@@ -19,7 +19,7 @@ type VerifyHandler struct {
 	*configs.Config
 }
 
-func NewVerifyHandler(router *http.ServeMux, deps *VerifyHandlerDeps) {
+func NewVerifyHandler(router *http.ServeMux, deps VerifyHandlerDeps) {
 	handler := &VerifyHandler{
 		Config: deps.Config,
 	}

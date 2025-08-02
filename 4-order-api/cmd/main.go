@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"go/order-api/configs"
 	"go/order-api/internals/auth"
+	"go/order-api/internals/link"
+	"go/order-api/internals/product"
 	"go/order-api/internals/verify"
 	"go/order-api/pkg/db"
 	"net/http"
@@ -11,11 +13,23 @@ import (
 
 func main() {
 	config := configs.LoadConfig()
-	_ = db.NewDb(config)
+	db := db.NewDb(config)
 	router := http.NewServeMux()
+
+	// Repositories
+	linkRepository := link.NewLinkRepository(db)
+	productRepository := product.NewProductRepository(db)
+
+	// Handlers
 	auth.NewAuthHandler(router)
-	verify.NewVerifyHandler(router, &verify.VerifyHandlerDeps{
+	link.NewLinkHandler(router, link.LinkHandlerDeps{
+		LinkRepository: linkRepository,
+	})
+	verify.NewVerifyHandler(router, verify.VerifyHandlerDeps{
 		Config: config,
+	})
+	product.NewProductHandler(router, product.ProductHandlerDeps{
+		ProductRepository: productRepository,
 	})
 
 	server := http.Server{
