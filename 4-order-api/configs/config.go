@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"go/order-api/pkg/jwt"
 	"log"
 	"os"
 
@@ -10,6 +11,7 @@ import (
 type Config struct {
 	MailConf EmailConfig
 	Db       DbConfig
+	Jwt      jwt.JWT
 }
 
 type DbConfig struct {
@@ -35,6 +37,9 @@ func LoadConfig() *Config {
 		},
 		Db: DbConfig{
 			Dsn: os.Getenv("DB_DSN"),
+		},
+		Jwt: jwt.JWT{
+			Secret: os.Getenv("SECRET"),
 		},
 	}
 }

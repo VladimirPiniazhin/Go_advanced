@@ -29,9 +29,13 @@ func (handler *AuthHandler) Register() http.HandlerFunc {
 		if err != nil {
 			return
 		}
-		handler.AuthService.Register(body.Email, body.Password, body.Name)
+		token, err := handler.AuthService.Register(body.Email, body.Password, body.Name)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
 
-		result := fmt.Sprintf("Registration user %s with email: %s is successful", body.Name, body.Email)
+		result := fmt.Sprintf("Registration user %s with email: %s is successful. Token: %s", body.Name, body.Email, token)
 
 		res.JsonResponse(w, 201, result)
 
@@ -41,11 +45,22 @@ func (handler *AuthHandler) Register() http.HandlerFunc {
 func (handler *AuthHandler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
 
-		_, err := req.HandleBody[LoginRequest](&w, request)
+		body, err := req.HandleBody[LoginRequest](&w, request)
 		if err != nil {
+
 			return
 		}
-		result := "Login is successful"
+
+		token, err := handler.AuthService.UserLogin(body.Email, body.Password)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		result := AuthorizationResponse{
+			Token: token,
+			Msg:   fmt.Sprintf("User: %s -  login is successful.", body.Email),
+		}
 		res.JsonResponse(w, 200, result)
 
 	}

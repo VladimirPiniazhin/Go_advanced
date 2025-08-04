@@ -11,6 +11,8 @@ require (
 	gorm.io/gorm v1.30.1
 )
 
+require github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
+
 require (
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

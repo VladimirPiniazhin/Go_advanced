@@ -36,6 +36,14 @@ func (repo *UserRepository) FindByEmail(email string) (*User, error) {
 	}
 	return &user, nil
 }
+func (repo *UserRepository) FindByPhoneNumber(phone string) (*User, error) {
+	var user User
+	result := repo.database.DB.First(&user, "phone = ?", phone)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
 
 // Сохранение пользователя
 func SaveUser(email string, password string, name string) error {

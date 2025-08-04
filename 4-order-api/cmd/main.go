@@ -9,6 +9,7 @@ import (
 	"go/order-api/internals/user"
 	"go/order-api/internals/verify"
 	"go/order-api/pkg/db"
+	"go/order-api/pkg/jwt"
 	"go/order-api/pkg/middleware"
 	"log"
 	"net/http"
@@ -32,6 +33,8 @@ func main() {
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 	logger.SetLevel(logger.InfoLevel)
+	//JWT
+	jwtInstance := jwt.NewJWT(config.Jwt.Secret)
 
 	// Repositories
 	linkRepository := link.NewLinkRepository(db)
@@ -39,7 +42,7 @@ func main() {
 	userRepository := user.NewUserRepository(db)
 
 	// Services
-	authService := auth.NewAuthService(userRepository)
+	authService := auth.NewAuthService(userRepository, jwtInstance)
 
 	// Handlers
 	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
