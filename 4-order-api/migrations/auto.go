@@ -21,7 +21,5 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&link.Link{})
-	db.AutoMigrate(&product.Product{})
-	db.AutoMigrate(&user.User{})
+	db.AutoMigrate(&link.Link{}, &product.Product{}, &user.User{})
 }

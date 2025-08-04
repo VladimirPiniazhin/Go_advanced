@@ -2,20 +2,23 @@ package auth
 
 import (
 	"fmt"
-	"go/order-api/internals/user"
 	"go/order-api/pkg/req"
 	res "go/order-api/pkg/res"
 	"net/http"
 )
 
 type AuthHandlerDeps struct {
+	*AuthService
 }
 
 type AuthHandler struct {
+	*AuthService
 }
 
-func NewAuthHandler(router *http.ServeMux) {
-	handler := &AuthHandler{}
+func NewAuthHandler(router *http.ServeMux, deps AuthHandlerDeps) {
+	handler := &AuthHandler{
+		AuthService: deps.AuthService,
+	}
 	router.HandleFunc("POST /auth/login", handler.Login())
 	router.HandleFunc("POST /auth/register", handler.Register())
 }
@@ -26,13 +29,9 @@ func (handler *AuthHandler) Register() http.HandlerFunc {
 		if err != nil {
 			return
 		}
-		err = user.SaveUser(body.Email, body.Password, body.Name)
-		if err != nil {
-			res.JsonResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		handler.AuthService.Register(body.Email, body.Password, body.Name)
 
-		result := fmt.Sprintf("Registration user %s is successful", body.Name)
+		result := fmt.Sprintf("Registration user %s with email: %s is successful", body.Name, body.Email)
 
 		res.JsonResponse(w, 201, result)
 

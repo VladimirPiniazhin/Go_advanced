@@ -6,6 +6,7 @@ import (
 	"go/order-api/internals/auth"
 	"go/order-api/internals/link"
 	"go/order-api/internals/product"
+	"go/order-api/internals/user"
 	"go/order-api/internals/verify"
 	"go/order-api/pkg/db"
 	"go/order-api/pkg/middleware"
@@ -35,9 +36,15 @@ func main() {
 	// Repositories
 	linkRepository := link.NewLinkRepository(db)
 	productRepository := product.NewProductRepository(db)
+	userRepository := user.NewUserRepository(db)
+
+	// Services
+	authService := auth.NewAuthService(userRepository)
 
 	// Handlers
-	auth.NewAuthHandler(router)
+	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
+		AuthService: authService,
+	})
 	link.NewLinkHandler(router, link.LinkHandlerDeps{
 		LinkRepository: linkRepository,
 	})
