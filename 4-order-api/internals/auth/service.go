@@ -5,6 +5,8 @@ import (
 	"go/order-api/internals/link"
 	"go/order-api/internals/user"
 	"go/order-api/pkg/jwt"
+	"math/rand"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,7 +23,7 @@ func NewAuthService(userRepository *user.UserRepository, j *jwt.JWT) *AuthServic
 	}
 }
 
-func (service *AuthService) Register(email, password, name string) (string, error) {
+func (service *AuthService) Register(email, password, name, phone string) (string, error) {
 	existedUser, _ := service.UserRepository.FindByEmail(email)
 	if existedUser != nil {
 		return "", errors.New(ErrUserExists)
@@ -34,6 +36,7 @@ func (service *AuthService) Register(email, password, name string) (string, erro
 		Email:    email,
 		Password: string(hashedPassword),
 		Name:     name,
+		Phone:    phone,
 	}
 	_, err = service.UserRepository.CreateUser(user)
 	if err != nil {
@@ -66,12 +69,34 @@ func (service *AuthService) UserLogin(email, password string) (string, error) {
 	return token, nil
 }
 
-func (service *AuthService) VerifyByPhone(phoneNumber string) (string, error) {
+func (service *AuthService) UpdateSessionID(phoneNumber string) (string, string, error) {
 	existedUser, _ := service.UserRepository.FindByPhoneNumber(phoneNumber)
+	if existedUser == nil {
+		return "", "", errors.New(ErrWrongCredentials)
+	}
+	existedUser.Session.SessionID = link.RandsStringRunes(10)
+	code := strconv.Itoa(rand.Intn(1000))
+	existedUser.Session.Code = code
+	_, err := service.UserRepository.PatchUser(existedUser)
+	if err != nil {
+		return "", "", errors.New(ErrInternalError)
+	}
+
+	return existedUser.Session.SessionID, code, nil
+}
+
+func (service *AuthService) VerifyUserBySmsCode(sessionID, code string) (string, error) {
+	existedUser, _ := service.UserRepository.FindBySession(sessionID)
 	if existedUser == nil {
 		return "", errors.New(ErrWrongCredentials)
 	}
-	sessionID := link.RandsStringRunes(10)
+	if existedUser.Session.Code != code {
+		return "", errors.New(ErrWrongCredentials)
+	}
 
-	return sessionID, nil
+	token, err := service.jwt.Create(existedUser.Email)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

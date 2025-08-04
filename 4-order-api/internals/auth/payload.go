@@ -13,6 +13,7 @@ type RegisterRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 	Name     string `json:"name"`
+	Phone    string `json:"phone" validate:"required,e164"`
 }
 
 type VerifyRequest struct {
@@ -20,10 +21,15 @@ type VerifyRequest struct {
 }
 
 type VerifyResponse struct {
-	SessionID string `json:"sessionID"`
+	Session Session
 }
 
-type AuthorizationRequest struct {
-	SessionID string `json:"sessionID"`
+type AuthorizationBySMSRequest struct {
+	SessionID string `json:"session_id"`
+	Code      string `json:"code"`
+}
+
+type Session struct {
+	SessionID string `json:"session_id"`
 	Code      string `json:"code"`
 }
