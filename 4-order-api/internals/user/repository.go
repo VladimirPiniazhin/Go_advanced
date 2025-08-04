@@ -28,6 +28,25 @@ func (repo *UserRepository) CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
+func (repo *UserRepository) PatchUser(user *User) (*User, error) {
+	result := repo.database.DB.Save(user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return user, nil
+}
+
+func (repo *UserRepository) DeleteUser(id uint) error {
+	result := repo.database.DB.Delete(&User{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("User not exist")
+	}
+	return nil
+}
+
 func (repo *UserRepository) FindByEmail(email string) (*User, error) {
 	var user User
 	result := repo.database.DB.First(&user, "email = ?", email)
@@ -36,9 +55,19 @@ func (repo *UserRepository) FindByEmail(email string) (*User, error) {
 	}
 	return &user, nil
 }
+
 func (repo *UserRepository) FindByPhoneNumber(phone string) (*User, error) {
 	var user User
 	result := repo.database.DB.First(&user, "phone = ?", phone)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
+func (repo *UserRepository) FindBySession(sessionID string) (*User, error) {
+	var user User
+	result := repo.database.DB.First(&user, "session_id = ?", sessionID)
 	if result.Error != nil {
 		return nil, result.Error
 	}
