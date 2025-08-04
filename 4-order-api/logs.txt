@@ -1,0 +1,4 @@
+{"execution":"13.3956ms","level":"info","method":"POST","msg":"Handled request","path":"/products","statuscode":200,"time":"2025-08-03 19:48:48"}
+{"execution":"18.1109ms","level":"info","method":"POST","msg":"Handled request","path":"/products","statuscode":200,"time":"2025-08-03 19:54:10"}
+{"execution":"7.2949ms","level":"info","method":"POST","msg":"Handled request","path":"/products","statuscode":200,"time":"2025-08-03 19:56:53"}
+{"execution":"11.6518ms","level":"info","method":"POST","msg":"Handled request","path":"/products","statuscode":200,"time":"2025-08-03 19:59:51"}
