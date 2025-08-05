@@ -1,13 +1,14 @@
 package middleware
 
 import (
+	"go/order-api/configs"
 	"net/http"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func Logging(next http.Handler) http.Handler {
+func Logging(next http.Handler, _ *configs.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		start := time.Now()
 		wrapper := &WrapperWriter{

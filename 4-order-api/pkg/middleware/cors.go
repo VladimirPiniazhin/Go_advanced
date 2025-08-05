@@ -1,8 +1,11 @@
 package middleware
 
-import "net/http"
+import (
+	"go/order-api/configs"
+	"net/http"
+)
 
-func CORS(next http.Handler) http.Handler {
+func CORS(next http.Handler, _ *configs.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("origin")
 		if origin == "" {

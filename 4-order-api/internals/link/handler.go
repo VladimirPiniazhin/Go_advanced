@@ -2,6 +2,8 @@ package link
 
 import (
 	"fmt"
+	"go/order-api/configs"
+	"go/order-api/pkg/middleware"
 	"go/order-api/pkg/req"
 	"go/order-api/pkg/res"
 	"net/http"
@@ -12,18 +14,21 @@ import (
 
 type LinkHandlerDeps struct {
 	LinkRepository *LinkRepository
+	Config         *configs.Config
 }
 
 type LinkHandler struct {
 	LinkRepository *LinkRepository
+	Config         *configs.Config
 }
 
 func NewLinkHandler(router *http.ServeMux, deps LinkHandlerDeps) {
 	handler := &LinkHandler{
 		LinkRepository: deps.LinkRepository,
+		Config:         deps.Config,
 	}
 	router.HandleFunc("POST /link", handler.Create())
-	router.HandleFunc("PATCH /link/{id}", handler.Update())
+	router.Handle("PATCH /link/{id}", handler.Update())
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
 	router.HandleFunc("GET /{hash}", handler.GoTo())
 
@@ -48,6 +53,13 @@ func (handler *LinkHandler) Create() http.HandlerFunc {
 
 func (handler *LinkHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
+		email, ok := request.Context().Value(middleware.ContextEmailKey).(string)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		fmt.Println(email)
+
 		body, err := req.HandleBody[LinkUpdateRequest](&w, request)
 		if err != nil {
 			return

@@ -43,7 +43,7 @@ func (service *AuthService) Register(email, password, name, phone string) (strin
 		return "", nil
 	}
 
-	token, err := service.jwt.Create(user.Email)
+	token, err := service.jwt.Create(jwt.JWTData{Email: email})
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +62,7 @@ func (service *AuthService) UserLogin(email, password string) (string, error) {
 	if err != nil {
 		return "", errors.New(ErrWrongCredentials)
 	}
-	token, err := service.jwt.Create(email)
+	token, err := service.jwt.Create(jwt.JWTData{Email: email})
 	if err != nil {
 		return "", err
 	}
@@ -94,7 +94,7 @@ func (service *AuthService) VerifyUserBySmsCode(sessionID, code string) (string,
 		return "", errors.New(ErrWrongCredentials)
 	}
 
-	token, err := service.jwt.Create(existedUser.Email)
+	token, err := service.jwt.Create(jwt.JWTData{Email: existedUser.Email})
 	if err != nil {
 		return "", err
 	}

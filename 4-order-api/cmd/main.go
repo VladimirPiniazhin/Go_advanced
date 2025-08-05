@@ -50,6 +50,7 @@ func main() {
 	})
 	link.NewLinkHandler(router, link.LinkHandlerDeps{
 		LinkRepository: linkRepository,
+		Config:         config,
 	})
 	verify.NewVerifyHandler(router, verify.VerifyHandlerDeps{
 		Config: config,
@@ -65,7 +66,7 @@ func main() {
 	)
 	server := http.Server{
 		Addr:    ":8081",
-		Handler: stack(router),
+		Handler: stack(router, config),
 	}
 	fmt.Println("Server listening on port 8081")
 	server.ListenAndServe()
