@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"go/order-api/configs"
 	"go/order-api/pkg/jwt"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 type key string
 
 const (
-	ContextEmailKey key = "ContextEmailKey"
+	ContextPhoneKey key = "ContextPhoneKey"
 )
 
 func writeUnauthorized(w http.ResponseWriter) {
@@ -25,7 +26,6 @@ func IsAuthed(next http.Handler, config *configs.Config) http.Handler {
 		header := r.Header.Get("Authorization")
 		if !strings.HasPrefix(header, "Bearer ") {
 			writeUnauthorized(w)
-
 			return
 		}
 		token := strings.TrimPrefix(header, "Bearer ")
@@ -34,7 +34,8 @@ func IsAuthed(next http.Handler, config *configs.Config) http.Handler {
 			writeUnauthorized(w)
 			return
 		}
-		ctx := context.WithValue(r.Context(), ContextEmailKey, data.Email)
+		fmt.Println(data.Phone)
+		ctx := context.WithValue(r.Context(), ContextPhoneKey, data.Phone)
 		req := r.WithContext(ctx)
 		next.ServeHTTP(w, req)
 	})

@@ -159,3 +159,12 @@
 {"execution":"16.9511ms","level":"info","method":"PATCH","msg":"Handled request","path":"/link/1","statuscode":200,"time":"2025-08-05 20:31:49"}
 {"execution":"0s","level":"info","method":"PATCH","msg":"Handled request","path":"/link/1","statuscode":200,"time":"2025-08-05 20:32:15"}
 {"execution":"6.3093ms","level":"info","method":"PATCH","msg":"Handled request","path":"/link/1","statuscode":200,"time":"2025-08-05 20:32:20"}
+{"execution":"0s","level":"info","method":"POST","msg":"Handled request","path":"/auth/sendsms","statuscode":200,"time":"2025-08-05 22:02:15"}
+{"execution":"0s","level":"info","method":"POST","msg":"Handled request","path":"/auth/login","statuscode":200,"time":"2025-08-05 22:10:25"}
+{"execution":"5.7086ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/register","statuscode":200,"time":"2025-08-05 22:18:09"}
+{"execution":"52.1817ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/register","statuscode":200,"time":"2025-08-05 22:18:23"}
+{"execution":"9.6168ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/sendsms","statuscode":200,"time":"2025-08-05 22:19:49"}
+{"execution":"1.9303ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/verify","statuscode":200,"time":"2025-08-05 22:20:30"}
+{"execution":"4.4068ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/verify","statuscode":200,"time":"2025-08-05 22:21:00"}
+{"execution":"1.3809ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/verify","statuscode":200,"time":"2025-08-05 22:21:02"}
+{"execution":"5.7413ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/verify","statuscode":200,"time":"2025-08-05 22:21:38"}

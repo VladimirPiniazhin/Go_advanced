@@ -53,12 +53,12 @@ func (handler *LinkHandler) Create() http.HandlerFunc {
 
 func (handler *LinkHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
-		email, ok := request.Context().Value(middleware.ContextEmailKey).(string)
+		phone, ok := request.Context().Value(middleware.ContextPhoneKey).(string)
 		if !ok {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		fmt.Println(email)
+		fmt.Println(phone)
 
 		body, err := req.HandleBody[LinkUpdateRequest](&w, request)
 		if err != nil {
