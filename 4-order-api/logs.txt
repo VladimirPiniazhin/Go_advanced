@@ -159,3 +159,8 @@
 {"execution":"16.9511ms","level":"info","method":"PATCH","msg":"Handled request","path":"/link/1","statuscode":200,"time":"2025-08-05 20:31:49"}
 {"execution":"0s","level":"info","method":"PATCH","msg":"Handled request","path":"/link/1","statuscode":200,"time":"2025-08-05 20:32:15"}
 {"execution":"6.3093ms","level":"info","method":"PATCH","msg":"Handled request","path":"/link/1","statuscode":200,"time":"2025-08-05 20:32:20"}
+{"execution":"10.9442ms","level":"info","method":"GET","msg":"Handled request","path":"/link","statuscode":200,"time":"2025-08-06 14:55:36"}
+{"execution":"11.9731ms","level":"info","method":"GET","msg":"Handled request","path":"/link","statuscode":200,"time":"2025-08-06 15:00:12"}
+{"execution":"3.0542ms","level":"info","method":"GET","msg":"Handled request","path":"/link","statuscode":200,"time":"2025-08-06 15:00:21"}
+{"execution":"6.2333ms","level":"info","method":"GET","msg":"Handled request","path":"/rEqEBQ","statuscode":200,"time":"2025-08-06 21:58:35"}
+{"execution":"1.6343ms","level":"info","method":"GET","msg":"Handled request","path":"/iJsfmq","statuscode":200,"time":"2025-08-06 21:59:30"}

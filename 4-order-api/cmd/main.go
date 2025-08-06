@@ -6,9 +6,11 @@ import (
 	"go/order-api/internals/auth"
 	"go/order-api/internals/link"
 	"go/order-api/internals/product"
+	"go/order-api/internals/stat"
 	"go/order-api/internals/user"
 	"go/order-api/internals/verify"
 	"go/order-api/pkg/db"
+	"go/order-api/pkg/event"
 	"go/order-api/pkg/jwt"
 	"go/order-api/pkg/middleware"
 	"log"
@@ -22,6 +24,7 @@ func main() {
 	config := configs.LoadConfig()
 	db := db.NewDb(config)
 	router := http.NewServeMux()
+	eventBus := event.NewEventBus()
 
 	// Logging
 	file, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -40,9 +43,13 @@ func main() {
 	linkRepository := link.NewLinkRepository(db)
 	productRepository := product.NewProductRepository(db)
 	userRepository := user.NewUserRepository(db)
-
+	statRepository := stat.NewStatRepository(db)
 	// Services
 	authService := auth.NewAuthService(userRepository, jwtInstance)
+	statService := stat.NewStatService(&stat.StatServiceDeps{
+		EventBus:       eventBus,
+		StatRepository: statRepository,
+	})
 
 	// Handlers
 	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
@@ -51,6 +58,7 @@ func main() {
 	link.NewLinkHandler(router, link.LinkHandlerDeps{
 		LinkRepository: linkRepository,
 		Config:         config,
+		EventBus:       eventBus,
 	})
 	verify.NewVerifyHandler(router, verify.VerifyHandlerDeps{
 		Config: config,
@@ -62,12 +70,15 @@ func main() {
 	stack := middleware.Chain(
 		middleware.CORS,
 		middleware.Logging,
-		middleware.IsAuthed,
+		//middleware.IsAuthed,
 	)
 	server := http.Server{
 		Addr:    ":8081",
 		Handler: stack(router, config),
 	}
+
+	go statService.AddClick()
+
 	fmt.Println("Server listening on port 8081")
 	server.ListenAndServe()
 

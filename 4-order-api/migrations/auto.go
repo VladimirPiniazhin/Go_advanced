@@ -3,6 +3,7 @@ package main
 import (
 	"go/order-api/internals/link"
 	"go/order-api/internals/product"
+	"go/order-api/internals/stat"
 	"go/order-api/internals/user"
 	"os"
 
@@ -21,5 +22,5 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&link.Link{}, &product.Product{}, &user.User{})
+	db.AutoMigrate(&link.Link{}, &product.Product{}, &user.User{}, &stat.Stat{})
 }

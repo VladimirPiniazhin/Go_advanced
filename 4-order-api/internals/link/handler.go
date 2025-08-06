@@ -3,6 +3,7 @@ package link
 import (
 	"fmt"
 	"go/order-api/configs"
+	"go/order-api/pkg/event"
 	"go/order-api/pkg/middleware"
 	"go/order-api/pkg/req"
 	"go/order-api/pkg/res"
@@ -15,22 +16,26 @@ import (
 type LinkHandlerDeps struct {
 	LinkRepository *LinkRepository
 	Config         *configs.Config
+	EventBus       *event.EventBus
 }
 
 type LinkHandler struct {
 	LinkRepository *LinkRepository
 	Config         *configs.Config
+	EventBus       *event.EventBus
 }
 
 func NewLinkHandler(router *http.ServeMux, deps LinkHandlerDeps) {
 	handler := &LinkHandler{
 		LinkRepository: deps.LinkRepository,
 		Config:         deps.Config,
+		EventBus:       deps.EventBus,
 	}
 	router.HandleFunc("POST /link", handler.Create())
-	router.Handle("PATCH /link/{id}", handler.Update())
+	router.HandleFunc("PATCH /link/{id}", handler.Update())
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
 	router.HandleFunc("GET /{hash}", handler.GoTo())
+	router.HandleFunc("GET /link", handler.GetAll())
 
 }
 
@@ -110,6 +115,35 @@ func (handler *LinkHandler) GoTo() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
+		go handler.EventBus.Publish(event.Event{
+			Type: event.EventLinkVisited,
+			Data: link.ID,
+		})
 		http.Redirect(w, request, link.Url, http.StatusTemporaryRedirect)
+	}
+}
+
+func (handler *LinkHandler) GetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, request *http.Request) {
+
+		limit, err := strconv.Atoi(request.URL.Query().Get("limit"))
+		if err != nil {
+			http.Error(w, "Invalid query parameters", http.StatusBadRequest)
+			return
+		}
+		offset, err := strconv.Atoi(request.URL.Query().Get("offset"))
+		if err != nil {
+			http.Error(w, "Invalid query parameters", http.StatusBadRequest)
+			return
+		}
+		links := handler.LinkRepository.GetAll(limit, offset)
+		count := handler.LinkRepository.Count()
+		result := GetAllLinksResponse{
+			Links: links,
+			Count: count,
+		}
+
+		res.JsonResponse(w, 200, result)
+
 	}
 }

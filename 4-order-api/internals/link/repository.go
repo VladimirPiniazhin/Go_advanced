@@ -9,9 +9,9 @@ type LinkRepository struct {
 	Database *db.Db
 }
 
-func NewLinkRepository(database *db.Db) *LinkRepository {
+func NewLinkRepository(db *db.Db) *LinkRepository {
 	return &LinkRepository{
-		Database: database,
+		Database: db,
 	}
 }
 
@@ -48,4 +48,27 @@ func (repo *LinkRepository) Delete(id uint) error {
 		return errors.New("Url not exist")
 	}
 	return nil
+
+}
+func (repo *LinkRepository) Count() int64 {
+	var count int64
+	repo.Database.
+		Table("links").
+		Where("deleted_at is null").
+		Count(&count)
+
+	return count
+}
+
+func (repo *LinkRepository) GetAll(limit, offset int) []Link {
+	var links []Link
+	repo.Database.
+		Table("links").
+		Where("deleted_at is null").
+		Order("id asc").
+		Limit(limit).
+		Offset(offset).
+		Scan(&links)
+
+	return links
 }
