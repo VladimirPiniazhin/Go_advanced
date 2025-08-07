@@ -52,6 +52,10 @@ func main() {
 	})
 
 	// Handlers
+	stat.NewStatHandler(router, stat.StatHandlerDeps{
+		StatRepository: statRepository,
+		Config:         config,
+	})
 	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
 		AuthService: authService,
 	})
