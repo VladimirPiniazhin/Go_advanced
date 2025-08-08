@@ -15,14 +15,11 @@ import (
 	"go/order-api/pkg/event"
 	"go/order-api/pkg/jwt"
 	"go/order-api/pkg/middleware"
-	"log"
 	"net/http"
-	"os"
-
-	logger "github.com/sirupsen/logrus"
 )
 
-func main() {
+// App создает и настраивает HTTP-хендлер для тестирования
+func App() http.Handler {
 	// Загружаем конфигурацию
 	config := configs.LoadConfig()
 
@@ -34,17 +31,6 @@ func main() {
 
 	// Создаём EventBus
 	eventBus := event.NewEventBus()
-
-	// Logging setup
-	file, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("Не удалось открыть файл логов: %v", err)
-	}
-	logger.SetOutput(file)
-	logger.SetFormatter(&logger.JSONFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
-	logger.SetLevel(logger.InfoLevel)
 
 	// Создаём сервисы
 	jwtService := jwt.NewJWT(config.Jwt.Secret)
@@ -96,15 +82,18 @@ func main() {
 		middleware.Simple(middleware.LoggingSimple),
 	)
 
+	// Запускаем статистический сервис в фоне
+	go statService.AddClick()
+
+	return stack(router, config)
+}
+
+func main() {
 	server := http.Server{
 		Addr:    ":8081",
-		Handler: stack(router, config),
+		Handler: App(),
 	}
-
-	// Запускаем статистический сервис
-	go statService.AddClick()
 
 	fmt.Println("Server listening on port 8081")
 	server.ListenAndServe()
-
 }
