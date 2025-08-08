@@ -4,27 +4,35 @@ import (
 	"fmt"
 	"go/order-api/configs"
 	"go/order-api/internals/user"
-	email "go/order-api/pkg/email"
+	"go/order-api/pkg/email"
 	"go/order-api/pkg/hash"
+	"go/order-api/pkg/middleware"
 	"go/order-api/pkg/req"
 	res "go/order-api/pkg/res"
 	"net/http"
 )
 
 type VerifyHandlerDeps struct {
-	*configs.Config
+	EmailService *email.EmailService
+	Config       *configs.Config
 }
 
 type VerifyHandler struct {
-	*configs.Config
+	EmailService *email.EmailService
+	Config       *configs.Config
 }
 
 func NewVerifyHandler(router *http.ServeMux, deps VerifyHandlerDeps) {
 	handler := &VerifyHandler{
-		Config: deps.Config,
+		EmailService: deps.EmailService,
+		Config:       deps.Config,
 	}
-	router.HandleFunc("POST /send", handler.SendLink())
+
+	// Публичный роут (без авторизации)
 	router.HandleFunc("GET /verify/{hash}", handler.Verify())
+
+	// Защищённый роут (с авторизацией)
+	router.HandleFunc("POST /send", middleware.WithAuth(handler.SendLink(), deps.Config))
 }
 
 func (handler *VerifyHandler) SendLink() http.HandlerFunc {
@@ -46,7 +54,7 @@ func (handler *VerifyHandler) SendLink() http.HandlerFunc {
 			return
 		}
 		//Отправляем ссылку для верификации для пользователя
-		err = email.SendEmail(body.Address, verifyHash, handler.MailConf.Email, handler.MailConf.Password)
+		err = handler.EmailService.SendVerificationEmail(body.Address, verifyHash)
 		if err != nil {
 			return
 		}

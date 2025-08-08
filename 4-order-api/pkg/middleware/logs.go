@@ -8,7 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Logging(next http.Handler, _ *configs.Config) http.Handler {
+// Простая версия Logging без конфига
+func LoggingSimple(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		start := time.Now()
 		wrapper := &WrapperWriter{
@@ -23,6 +24,11 @@ func Logging(next http.Handler, _ *configs.Config) http.Handler {
 			"execution":  time.Since(start).String(),
 		}).Info("Handled request")
 	})
+}
+
+// Deprecated: Use LoggingSimple instead
+func Logging(next http.Handler, _ *configs.Config) http.Handler {
+	return LoggingSimple(next)
 }
 
 // func Logging(next http.Handler) http.Handler {

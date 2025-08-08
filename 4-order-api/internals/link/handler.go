@@ -15,28 +15,31 @@ import (
 
 type LinkHandlerDeps struct {
 	LinkRepository *LinkRepository
-	Config         *configs.Config
 	EventBus       *event.EventBus
+	Config         *configs.Config
 }
 
 type LinkHandler struct {
 	LinkRepository *LinkRepository
-	Config         *configs.Config
 	EventBus       *event.EventBus
+	Config         *configs.Config
 }
 
 func NewLinkHandler(router *http.ServeMux, deps LinkHandlerDeps) {
 	handler := &LinkHandler{
 		LinkRepository: deps.LinkRepository,
-		Config:         deps.Config,
 		EventBus:       deps.EventBus,
+		Config:         deps.Config,
 	}
-	router.HandleFunc("POST /link", handler.Create())
-	router.HandleFunc("PATCH /link/{id}", handler.Update())
-	router.HandleFunc("DELETE /link/{id}", handler.Delete())
-	router.HandleFunc("GET /{hash}", handler.GoTo())
-	router.HandleFunc("GET /link", handler.GetAll())
 
+	// Публичные роуты (без авторизации)
+	router.HandleFunc("GET /{hash}", handler.GoTo())
+
+	// Защищённые роуты (с авторизацией)
+	router.HandleFunc("POST /link", middleware.WithAuth(handler.Create(), deps.Config))
+	router.HandleFunc("PATCH /link/{id}", middleware.WithAuth(handler.Update(), deps.Config))
+	router.HandleFunc("DELETE /link/{id}", middleware.WithAuth(handler.Delete(), deps.Config))
+	router.HandleFunc("GET /link", middleware.WithAuth(handler.GetAll(), deps.Config))
 }
 
 func (handler *LinkHandler) Create() http.HandlerFunc {

@@ -2,6 +2,8 @@ package product
 
 import (
 	"fmt"
+	"go/order-api/configs"
+	"go/order-api/pkg/middleware"
 	"go/order-api/pkg/req"
 	"go/order-api/pkg/res"
 	"net/http"
@@ -12,22 +14,28 @@ import (
 
 type ProductHandlerDeps struct {
 	ProductRepository *ProductRepository
+	Config            *configs.Config
 }
 
 type ProductHandler struct {
 	ProductRepository *ProductRepository
+	Config            *configs.Config
 }
 
 func NewProductHandler(router *http.ServeMux, deps ProductHandlerDeps) {
 	handler := &ProductHandler{
 		ProductRepository: deps.ProductRepository,
+		Config:            deps.Config,
 	}
+
+	// Публичные роуты (без авторизации)
 	router.HandleFunc("GET /products", handler.GetAll())
 	router.HandleFunc("GET /products/{id}", handler.GetOne())
-	router.HandleFunc("POST /products", handler.Create())
-	router.HandleFunc("PATCH /products/{id}", handler.Update())
-	router.HandleFunc("DELETE /products/{id}", handler.Delete())
 
+	// Защищённые роуты (с авторизацией)
+	router.HandleFunc("POST /products", middleware.WithAuth(handler.Create(), deps.Config))
+	router.HandleFunc("PATCH /products/{id}", middleware.WithAuth(handler.Update(), deps.Config))
+	router.HandleFunc("DELETE /products/{id}", middleware.WithAuth(handler.Delete(), deps.Config))
 }
 
 func (handler *ProductHandler) GetAll() http.HandlerFunc {

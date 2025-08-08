@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-func CORS(next http.Handler, _ *configs.Config) http.Handler {
+// Простая версия CORS без конфига
+func CORSSimple(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("origin")
 		if origin == "" {
@@ -22,4 +23,9 @@ func CORS(next http.Handler, _ *configs.Config) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+// Deprecated: Use CORSSimple instead
+func CORS(next http.Handler, _ *configs.Config) http.Handler {
+	return CORSSimple(next)
 }

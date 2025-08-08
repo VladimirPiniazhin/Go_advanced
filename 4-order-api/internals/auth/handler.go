@@ -19,6 +19,8 @@ func NewAuthHandler(router *http.ServeMux, deps AuthHandlerDeps) {
 	handler := &AuthHandler{
 		AuthService: deps.AuthService,
 	}
+
+	// Все auth роуты публичные
 	router.HandleFunc("POST /auth/login", handler.Login())
 	router.HandleFunc("POST /auth/register", handler.Register())
 	router.HandleFunc("POST /auth/sendsms", handler.VerifyBySMS())

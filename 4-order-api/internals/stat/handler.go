@@ -2,7 +2,6 @@ package stat
 
 import (
 	"fmt"
-	"go/order-api/configs"
 	"go/order-api/pkg/res"
 	"net/http"
 	"time"
@@ -15,7 +14,6 @@ const (
 
 type StatHandlerDeps struct {
 	StatRepository *StatRepository
-	Config         *configs.Config
 }
 
 type StatHandler struct {
@@ -27,8 +25,8 @@ func NewStatHandler(router *http.ServeMux, deps StatHandlerDeps) {
 		StatRepository: deps.StatRepository,
 	}
 
+	// Статистика публичная
 	router.HandleFunc("GET /stat", handler.GetStat())
-
 }
 
 func (handler *StatHandler) GetStat() http.HandlerFunc {

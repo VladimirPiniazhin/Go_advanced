@@ -13,10 +13,6 @@ type Product struct {
 	Price       int            `json:"price"`
 }
 
-type Cart struct {
-	Cart []Product `json:"cart"`
-}
-
 func NewProduct(
 	description string,
 	name string,
