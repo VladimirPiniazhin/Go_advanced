@@ -21,7 +21,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-func main() {
+func App() http.Handler {
 	// Загружаем конфигурацию
 	config := configs.LoadConfig()
 
@@ -83,19 +83,26 @@ func main() {
 		Config:            config,
 	})
 
+	// Запускаем статистический сервис
+	go statService.AddClick()
+
 	// Создаём middleware stack только с CORS и логированием
 	stack := middleware.Chain(
 		middleware.Simple(middleware.CORSSimple),
 		middleware.Simple(middleware.LoggingSimple),
 	)
 
+	return stack(router, config)
+}
+
+func main() {
+
+	app := App()
+
 	server := http.Server{
 		Addr:    ":8081",
-		Handler: stack(router, config),
+		Handler: app,
 	}
-
-	// Запускаем статистический сервис
-	go statService.AddClick()
 
 	fmt.Println("Server listening on port 8081")
 	server.ListenAndServe()

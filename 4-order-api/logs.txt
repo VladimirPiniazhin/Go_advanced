@@ -202,3 +202,9 @@
 {"execution":"2.6011ms","level":"info","method":"GET","msg":"Handled request","path":"/stat","statuscode":200,"time":"2025-08-07 22:37:15"}
 {"execution":"4.3642ms","level":"info","method":"GET","msg":"Handled request","path":"/stat","statuscode":200,"time":"2025-08-07 22:37:46"}
 {"execution":"4.5381ms","level":"info","method":"GET","msg":"Handled request","path":"/stat","statuscode":200,"time":"2025-08-07 22:37:54"}
+{"execution":"10.903ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/login","statuscode":200,"time":"2025-08-08 16:48:00"}
+{"execution":"1.65ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/login","statuscode":200,"time":"2025-08-08 16:48:17"}
+{"execution":"1.3243ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/login","statuscode":200,"time":"2025-08-08 16:48:48"}
+{"execution":"1.3181ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/login","statuscode":200,"time":"2025-08-08 16:49:12"}
+{"execution":"1.4014ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/register","statuscode":200,"time":"2025-08-08 16:49:44"}
+{"execution":"41.0661ms","level":"info","method":"POST","msg":"Handled request","path":"/auth/login","statuscode":200,"time":"2025-08-08 16:50:09"}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go/order-api/internals/link"
 	"go/order-api/internals/user"
+	"go/order-api/pkg/di"
 	"go/order-api/pkg/jwt"
 	"math/rand"
 	"strconv"
@@ -12,11 +13,11 @@ import (
 )
 
 type AuthService struct {
-	UserRepository *user.UserRepository
+	UserRepository di.IUserRepository
 	jwt            *jwt.JWT
 }
 
-func NewAuthService(userRepository *user.UserRepository, j *jwt.JWT) *AuthService {
+func NewAuthService(userRepository di.IUserRepository, j *jwt.JWT) *AuthService {
 	return &AuthService{
 		UserRepository: userRepository,
 		jwt:            j,
