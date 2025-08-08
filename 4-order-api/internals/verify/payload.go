@@ -6,3 +6,7 @@ type SendLinkRequest struct {
 type VerifyRequest struct {
 	Hash string `json:"hash"`
 }
+type VerifyResponse struct {
+	Message string `json:"message"`
+	Token   string `json:"token"`
+}

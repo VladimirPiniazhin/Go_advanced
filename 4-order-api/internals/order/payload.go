@@ -1,27 +1,23 @@
 package order
 
-import (
-	"go/order-api/internals/product"
-)
-
 type OrderCreateRequest struct {
-	UserId   uint              `json:"user_id"`
-	Products []product.Product `json:"products"`
+	UserID     uint        `json:"user_id"`
+	OrderItems []OrderItem `json:"order_items"`
 }
 
 type OrderUpdateRequest struct {
-	UserId   uint              `json:"user_id"`
-	Products []product.Product `json:"products"`
+	UserID     uint        `json:"user_id"`
+	OrderItems []OrderItem `json:"order_items"`
 }
 
 type OrderGetAllResponse struct {
-	Id       uint              `json:"id"`
-	UserId   uint              `json:"user_id"`
-	Products []product.Product `json:"products"`
+	ID         uint        `json:"id"`
+	UserID     uint        `json:"user_id"`
+	OrderItems []OrderItem `json:"order_items"`
 }
 
 type OrderGetOneResponse struct {
-	Id       uint              `json:"id"`
-	UserId   uint              `json:"user_id"`
-	Products []product.Product `json:"products"`
+	ID         uint        `json:"id"`
+	UserID     uint        `json:"user_id"`
+	OrderItems []OrderItem `json:"order_items"`
 }

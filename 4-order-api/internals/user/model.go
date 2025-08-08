@@ -10,13 +10,15 @@ type User struct {
 	Hash     string  `json:"hash"`
 	Phone    string  `json:"phone"`
 	Session  Session `gorm:"embedded"`
+	Orders   []Order `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type Order struct {
+	gorm.Model
+	UserID uint `json:"user_id"`
 }
 
 type Session struct {
 	SessionID string `json:"session_id"`
 	Code      string `json:"code"`
-}
-
-type UsersData struct {
-	Users []User `json:"users"`
 }

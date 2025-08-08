@@ -5,6 +5,7 @@ import (
 	"go/order-api/configs"
 	"go/order-api/internals/auth"
 	"go/order-api/internals/link"
+	"go/order-api/internals/order"
 	"go/order-api/internals/product"
 	"go/order-api/internals/stat"
 	"go/order-api/internals/user"
@@ -54,6 +55,7 @@ func main() {
 	productRepository := product.NewProductRepository(database)
 	userRepository := user.NewUserRepository(database)
 	statRepository := stat.NewStatRepository(database)
+	orderRepository := order.NewOrderRepository(database)
 
 	// Создаём бизнес-сервисы
 	authService := auth.NewAuthService(userRepository, jwtService)
@@ -81,6 +83,11 @@ func main() {
 	product.NewProductHandler(router, product.ProductHandlerDeps{
 		ProductRepository: productRepository,
 		Config:            config,
+	})
+	order.NewOrderHandler(router, order.OrderHandlerDeps{
+		OrderRepository: orderRepository,
+		Config:          config,
+		UserRepository:  userRepository,
 	})
 
 	// Создаём middleware stack только с CORS и логированием

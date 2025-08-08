@@ -3,29 +3,31 @@ package order
 import (
 	"fmt"
 	"go/order-api/configs"
+	"go/order-api/internals/user"
 	"go/order-api/pkg/middleware"
 	"go/order-api/pkg/req"
 	"go/order-api/pkg/res"
 	"net/http"
 	"strconv"
-
-	"gorm.io/gorm"
 )
 
 type OrderHandlerDeps struct {
 	OrderRepository *OrderRepository
 	Config          *configs.Config
+	UserRepository  *user.UserRepository
 }
 
 type OrderHandler struct {
 	OrderRepository *OrderRepository
 	Config          *configs.Config
+	UserRepository  *user.UserRepository
 }
 
 func NewOrderHandler(router *http.ServeMux, deps OrderHandlerDeps) {
 	handler := &OrderHandler{
 		OrderRepository: deps.OrderRepository,
 		Config:          deps.Config,
+		UserRepository:  deps.UserRepository,
 	}
 
 	// Защищённые роуты (с авторизацией)
@@ -38,7 +40,17 @@ func NewOrderHandler(router *http.ServeMux, deps OrderHandlerDeps) {
 
 func (handler *OrderHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
-		orders, err := handler.OrderRepository.GetAll()
+		phone, ok := request.Context().Value(middleware.ContextPhoneKey).(string)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		user, err := handler.UserRepository.FindByPhoneNumber(phone)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		orders, err := handler.OrderRepository.GetAll(user.ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -55,7 +67,17 @@ func (handler *OrderHandler) GetOne() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		order, err := handler.OrderRepository.GetByID(uint(id))
+		phone, ok := request.Context().Value(middleware.ContextPhoneKey).(string)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		user, err := handler.UserRepository.FindByPhoneNumber(phone)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		order, err := handler.OrderRepository.GetByID(uint(id), user.ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -70,9 +92,19 @@ func (handler *OrderHandler) Create() http.HandlerFunc {
 		if err != nil {
 			return
 		}
+		phone, ok := request.Context().Value(middleware.ContextPhoneKey).(string)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		user, err := handler.UserRepository.FindByPhoneNumber(phone)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		newOrder := NewOrder(
-			body.UserId,
-			body.Products,
+			user.ID,
+			body.OrderItems,
 		)
 		createdOrder, err := handler.OrderRepository.Create(newOrder)
 		if err != nil {
@@ -96,11 +128,23 @@ func (handler *OrderHandler) Update() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		order, err := handler.OrderRepository.Update(&Order{
-			Model:    gorm.Model{ID: uint(id)},
-			UserId:   body.UserId,
-			Products: body.Products,
-		})
+		phone, ok := request.Context().Value(middleware.ContextPhoneKey).(string)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		user, err := handler.UserRepository.FindByPhoneNumber(phone)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		order, err := handler.OrderRepository.GetByID(uint(id), user.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		order.OrderItems = body.OrderItems
+		order, err = handler.OrderRepository.Update(order)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

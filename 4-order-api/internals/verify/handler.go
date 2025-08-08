@@ -6,33 +6,34 @@ import (
 	"go/order-api/internals/user"
 	"go/order-api/pkg/email"
 	"go/order-api/pkg/hash"
-	"go/order-api/pkg/middleware"
+	"go/order-api/pkg/jwt"
 	"go/order-api/pkg/req"
 	res "go/order-api/pkg/res"
 	"net/http"
 )
 
 type VerifyHandlerDeps struct {
-	EmailService *email.EmailService
-	Config       *configs.Config
+	EmailService   *email.EmailService
+	Config         *configs.Config
+	UserRepository *user.UserRepository
 }
 
 type VerifyHandler struct {
-	EmailService *email.EmailService
-	Config       *configs.Config
+	EmailService   *email.EmailService
+	Config         *configs.Config
+	UserRepository *user.UserRepository
 }
 
 func NewVerifyHandler(router *http.ServeMux, deps VerifyHandlerDeps) {
 	handler := &VerifyHandler{
-		EmailService: deps.EmailService,
-		Config:       deps.Config,
+		EmailService:   deps.EmailService,
+		Config:         deps.Config,
+		UserRepository: deps.UserRepository,
 	}
 
 	// Публичный роут (без авторизации)
-	router.HandleFunc("GET /verify/{hash}", handler.Verify())
-
-	// Защищённый роут (с авторизацией)
-	router.HandleFunc("POST /send", middleware.WithAuth(handler.SendLink(), deps.Config))
+	router.HandleFunc("POST /send", handler.SendLink())
+	router.HandleFunc("POST /verify/{hash}", handler.Verify())
 }
 
 func (handler *VerifyHandler) SendLink() http.HandlerFunc {
@@ -42,17 +43,15 @@ func (handler *VerifyHandler) SendLink() http.HandlerFunc {
 			return
 		}
 		// Проверяем существоввание пользователя
-		userData, err := user.FindUserByEmail(body.Address)
-		if userData == nil {
+		user, err := handler.UserRepository.FindByEmail(body.Address)
+		if user == nil {
 			res.JsonResponse(w, 400, "User email is unknown")
 			return
 		}
 		// Генерируем и сохраняем хэш для него если он существует
 		verifyHash := hash.GenerateHash(body.Address)
-		err = user.SaveHash(userData, verifyHash)
-		if err != nil {
-			return
-		}
+		user.Hash = verifyHash
+		handler.UserRepository.PatchUser(user)
 		//Отправляем ссылку для верификации для пользователя
 		err = handler.EmailService.SendVerificationEmail(body.Address, verifyHash)
 		if err != nil {
@@ -71,7 +70,7 @@ func (handler *VerifyHandler) Verify() http.HandlerFunc {
 		hash := request.PathValue("hash")
 
 		// Получаем пользователя по хешу
-		user, err := user.GetUserHash(hash)
+		user, err := handler.UserRepository.FindByHash(hash)
 		if err != nil {
 			res.JsonResponse(w, 500, "Internal server error")
 			return
@@ -81,7 +80,22 @@ func (handler *VerifyHandler) Verify() http.HandlerFunc {
 			res.JsonResponse(w, 400, "Invalid or expired verification link")
 			return
 		}
+		// Удаляем хеш из пользователя чтобы он не смог его использовать повторно
+		user.Hash = ""
+		handler.UserRepository.PatchUser(user)
+		// Генерируем токен для пользователя
 		result := fmt.Sprintf("Verification for user email: '%s' is successful", user.Email)
-		res.JsonResponse(w, 200, result)
+		token, err := handler.Config.Jwt.Create(jwt.JWTData{
+			Phone: user.Phone,
+		})
+		if err != nil {
+			res.JsonResponse(w, 500, "Internal server error")
+			return
+		}
+
+		res.JsonResponse(w, 200, VerifyResponse{
+			Message: result,
+			Token:   token,
+		})
 	}
 }

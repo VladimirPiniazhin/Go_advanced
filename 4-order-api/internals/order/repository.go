@@ -23,17 +23,17 @@ func (repo *OrderRepository) Create(order *Order) (*Order, error) {
 	return order, nil
 }
 
-func (repo *OrderRepository) GetByID(id uint) (*Order, error) {
+func (repo *OrderRepository) GetByID(id uint, userID uint) (*Order, error) {
 	var order Order
-	result := repo.Database.DB.First(&order, "id = ?", id)
+	result := repo.Database.DB.Preload("OrderItems").First(&order, "id = ? AND user_id = ?", id, userID)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &order, nil
 }
-func (repo *OrderRepository) GetAll() (*[]Order, error) {
+func (repo *OrderRepository) GetAll(userID uint) (*[]Order, error) {
 	var orders []Order
-	result := repo.Database.DB.Find(&orders)
+	result := repo.Database.DB.Preload("OrderItems").Find(&orders, "user_id = ?", userID)
 	if result.Error != nil {
 		return nil, result.Error
 	}
